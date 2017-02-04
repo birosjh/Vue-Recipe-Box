@@ -1,0 +1,148 @@
+ <!DOCTYPE html>
+ <html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <title>Recipe Box</title>
+     <meta name="description" content="A simple recipe storage system.">
+     <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.3.0/css/bulma.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="script.js"></script>
+
+
+     <!--[if lt IE 9]>
+       <script src = "http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+     <![endif]-->
+ </head>
+
+ <body>
+
+   <div id="app">
+     <div class="container-fluid">
+       <nav class="nav">
+         <div class="nav-left">
+           <a class="nav-item" @click="toggleRecipeList">
+             <span class="icon">
+               <i id="recipe-list-toggle" class="fa fa-bars"></i>
+             </span>
+           </a>
+           <h2 id="page-title" class="nav-item">
+             Recipe Box
+           </h2>
+         </div>
+         <div class="nav-right">
+           <a class="nav-item is-pulled-right" @click='showNewRecipeWindow'>
+             <span class="icon">
+               <i class="fa fa-plus"></i>
+             </span>
+           </a>
+         </div>
+       </nav>
+     </div>
+
+     <div class="recipe-list is-hidden-desktop" v-show="recipeListVisible" v-cloak>
+       <aside class="menu">
+         <ul class="menu-list">
+           <li @click="toggleFilterControls">
+             <i class="fa fa-chevron-down"></i>
+             Filter Controls
+             <div id="filter-controls" v-show="filterControlsVisible">
+               <p class="control">
+                 <label class="checkbox" v-for="meal in meals">
+                   <input type="checkbox" :value='meal' v-model="mealFilterGroups">
+                   {{ meal }}
+                 </label>
+               </p>
+             </div>
+           </li>
+           <li v-for="recipe in filteredRecipes" @click="selectRecipe(recipe)"><a>{{ recipe.name }}</a></li>
+         </ul>
+       </aside>
+     </div>
+
+     <div class="container-fluid">
+       <div class="columns is-multiline">
+         <div class="recipe-list column is-one-quarter is-hidden-touch" v-show="recipeListVisible" v-cloak>
+           <aside class="menu">
+             <ul class="menu-list">
+               <li @click="toggleFilterControls">
+                 <div id="filter-controls" v-show="filterControlsVisible">
+                   <p class="control">
+                     <label class="checkbox" v-for="meal in meals">
+                       <input type="checkbox" :value='meal' v-model="mealFilterGroups">
+                       {{ meal }}
+                     </label>
+                   </p>
+                 </div>
+               </li>
+               <li v-for="recipe in filteredRecipes" @click="selectRecipe(recipe)"><a>{{ recipe.name }}</a></li>
+             </ul>
+           </aside>
+         </div>
+
+         <div class="column">
+           <div class="recipe-body container">
+             <article class="message">
+               <div class="message-header">
+                 <p id="recipe-title">{{ selectedRecipeName }}</p>
+                 <div class="block">
+                   <span v-for="group in selectedRecipeGroups" class="tag" :class="group" >{{ group }}</span>
+                 </div>
+               </div>
+               <div class="message-body">
+                 <ul>
+                   <li v-for="ingredient in selectedRecipeIngredients">{{ ingredient }}</li>
+                 </ul>
+               </div>
+               <div class="message-body">
+                  <p>{{ selectedRecipeInstructions }}</p>
+               </div>
+            </article>
+          </div>
+         </div>
+       </div>
+     </div>
+
+     <div :class="modalOnOff" v-cloak>
+       <div class="modal-background" @click="closeNewRecipeWindow"></div>
+       <div class="modal-content">
+         <div class="new-recipe-window">
+           <label class="label">Recipe Name</label>
+           <p class="control">
+             <input type="text" class="input" v-model="newRecipeName">
+           </p>
+           <label class="label">Ingredients</label>
+           <p class="control">
+             <textarea type="text" class="textarea" v-model="newRecipeIngredients"></textarea>
+           </p>
+           <label class="label">Instructions</label>
+           <p class="control">
+             <textarea type="text" class="textarea" v-model="newRecipeInstructions"></textarea>
+           </p>
+           <label class="label">Groups</label>
+           <p class="control">
+             <label class="checkbox" v-for="meal in meals">
+               <input type="checkbox" :value='meal' v-model="newRecipeGroups">
+               {{ meal }}
+             </label>
+           </p>
+           <div class="control is-grouped">
+             <p class="control">
+               <button class="button" @click="addRecipe">Add Recipe</button>
+             </p>
+             <p class="control">
+               <button class="button" @click="closeNewRecipeWindow">Cancel</button>
+             </p>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+
+ </body>
+
+ </html>
