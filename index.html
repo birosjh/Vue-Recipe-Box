@@ -54,7 +54,7 @@
 
          <div class="column">
            <div class="recipe-body container">
-             <article class="message">
+             <article class="message" v-if="selectedRecipeName !== ''">
                <div class="message-header">
                  <p id="recipe-title">{{ selectedRecipeName }}  <i class="fa fa-pencil" @click="editRecipe(selectedRecipeName)"></i></p>
                  <div class="is-pulled-right">

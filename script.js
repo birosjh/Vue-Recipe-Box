@@ -112,6 +112,7 @@ window.onload = function() {
                      ]
                    }
       ],
+      editedRecipeIndex: 0,
       meals: [ "breakfast", "lunch", "dinner", "snack" ],
       mealFilterGroups: [ ],
       modalOnOff: "modal ",
@@ -128,6 +129,12 @@ window.onload = function() {
       selectedRecipeGroups: [ ]
     },
     created: function () {
+      if(localStorage.getItem("recipes") !== null){
+        this.recipes = this.getSavedRecipesFromLocalStorage();
+      }
+      else{
+        localStorage.setItem("recipes", this.recipes);
+      }
       this.selectRecipe(this.recipes[0]);
     },
     methods: {
@@ -143,6 +150,19 @@ window.onload = function() {
                             });
           this.clearNewRecipeWindow();
           this.closeNewRecipeWindow();
+          this.checkIfRecipeListWasEmpty();
+          this.saveRecipesToLocalStorage();
+        }
+      },
+      saveRecipesToLocalStorage: function() {
+        localStorage.setItem("recipes", JSON.stringify(this.recipes));
+      },
+      getSavedRecipesFromLocalStorage: function() {
+        return JSON.parse(localStorage.getItem("recipes"));
+      },
+      checkIfRecipeListWasEmpty: function() {
+        if(this.recipes.length === 1){
+          this.selectRecipe(this.recipes[0]);
         }
       },
       updateRecipeWindow: function(recipeObject){
@@ -151,13 +171,17 @@ window.onload = function() {
         this.newRecipeInstructions = recipeObject.instructions;
         this.newRecipeGroups = recipeObject.groups;
       },
-      clearNewRecipeWindow: function () {
+      createEmptyRecipeObject: function() {
         var clearObject = {
           name: "",
           ingredients: [],
           instructions: "",
           groups: [ ]
         }
+        return clearObject
+      },
+      clearNewRecipeWindow: function () {
+        var clearObject = this.createEmptyRecipeObject();
         this.updateRecipeWindow(clearObject)
       },
       toggleRecipeList: function () {
@@ -188,16 +212,37 @@ window.onload = function() {
         this.editing = !this.editing;
 
         var recipeIndex = this.findRecipeIndexByName(name);
+        this.editedRecipeIndex = recipeIndex;
         var recipeToEdit = this.recipes[recipeIndex];
 
         this.showNewRecipeWindow();
         this.updateRecipeWindow(recipeToEdit);
       },
       saveRecipeEdit: function() {
-        console.log("delete!");
+        var indexOfRecipe = this.editedRecipeIndex;
+        this.recipes[indexOfRecipe].name = this.newRecipeName;
+        this.recipes[indexOfRecipe].ingredients = this.newRecipeIngredients.split(",");
+        this.recipes[indexOfRecipe].instructions = this.newRecipeInstructions;
+        this.recipes[indexOfRecipe].groups = this.newRecipeGroups;
+
+        this.selectRecipe(this.recipes[indexOfRecipe]);
+
+        this.clearNewRecipeWindow();
+        this.closeNewRecipeWindow();
+        this.saveRecipesToLocalStorage();
       },
       deleteRecipe: function() {
-        console.log("delete!");
+        var recipeIndex = this.findRecipeIndexByName(this.selectedRecipeName);
+        this.recipes.splice(recipeIndex, 1);
+        console.log(this.recipes);
+        if(this.recipes.length != 0){
+          this.selectRecipe(this.recipes[0]);
+        }
+        else{
+          var emptyRecipe = this.createEmptyRecipeObject();
+          this.selectRecipe(emptyRecipe);
+        }
+        this.saveRecipesToLocalStorage();
       }
     }
   })
