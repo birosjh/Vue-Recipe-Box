@@ -3,12 +3,15 @@ $primary-color: #E91E63;
 $dark-primary-color: #C2185B;
 $secondary-color: #F8BBD0;
 $white: #FFFFFF;
-$accent-color: #FFEB3B;
 $divider-color: #BDBDBD;
 $breakfast: #EFCB68;
 $lunch: #A4BFEB;
 $dinner: #DA4167;
 $snack: #44CF6C;
+
+@function tint($color, $percentage) {
+  @return mix(white, $color, $percentage);
+}
 
 html, body {
   background-color: $secondary-color;
@@ -17,8 +20,6 @@ html, body {
   padding: 0px;
   width: 100%;
 }
-
-
 
 // Navigation
 .nav {
@@ -34,11 +35,12 @@ html, body {
 }
 
 #filter-controls {
-  background-color: grey;
+  background-color: $white;
   border-radius: 10px;
+  color: black;
   margin: 10px;
   padding: 5px;
-  width: 220px;
+  width: 90%;
   .checkbox {
     margin: 5px;
     display: block;
@@ -63,6 +65,9 @@ html, body {
     padding: 4px;
     color: $white;
   }
+  #filter-list-item {
+    background-color: tint($primary-color, 30);
+  }
 }
 
 // Recipe Display Box
@@ -85,7 +90,10 @@ html, body {
     font-size: $title-font-size * 0.75;
   }
   .tag {
-    margin:  10px 3px;
+    margin: 10px 3px;
+  }
+  #recipe-delete {
+    margin: 10px 3px;
   }
 }
 

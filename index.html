@@ -4,6 +4,7 @@
 <head>
      <meta charset="UTF-8">
      <title>Recipe Box</title>
+     <meta name="theme-color" content="#C2185B"/>
      <meta name="description" content="A simple recipe storage system.">
      <meta name="viewport" content="width=device-width">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.3.0/css/bulma.css">
@@ -44,53 +45,21 @@
        </nav>
      </div>
 
-     <div class="recipe-list is-hidden-desktop" v-show="recipeListVisible" v-cloak>
-       <aside class="menu">
-         <ul class="menu-list">
-           <li @click="toggleFilterControls">
-             <i class="fa fa-chevron-down"></i>
-             Filter Controls
-             <div id="filter-controls" v-show="filterControlsVisible">
-               <p class="control">
-                 <label class="checkbox" v-for="meal in meals">
-                   <input type="checkbox" :value='meal' v-model="mealFilterGroups">
-                   {{ meal }}
-                 </label>
-               </p>
-             </div>
-           </li>
-           <li v-for="recipe in filteredRecipes" @click="selectRecipe(recipe)"><a>{{ recipe.name }}</a></li>
-         </ul>
-       </aside>
-     </div>
+    <menu-list extraclasses="is-hidden-desktop" :recipes="recipes" :meals="meals" @recipe-selected="selectRecipe" v-show="recipeListVisible"></menu-list>
 
      <div class="container-fluid">
        <div class="columns is-multiline">
-         <div class="recipe-list column is-one-quarter is-hidden-touch" v-show="recipeListVisible" v-cloak>
-           <aside class="menu">
-             <ul class="menu-list">
-               <li @click="toggleFilterControls">
-                 <div id="filter-controls" v-show="filterControlsVisible">
-                   <p class="control">
-                     <label class="checkbox" v-for="meal in meals">
-                       <input type="checkbox" :value='meal' v-model="mealFilterGroups">
-                       {{ meal }}
-                     </label>
-                   </p>
-                 </div>
-               </li>
-               <li v-for="recipe in filteredRecipes" @click="selectRecipe(recipe)"><a>{{ recipe.name }}</a></li>
-             </ul>
-           </aside>
-         </div>
+
+         <menu-list extraclasses="column is-one-quarter is-hidden-touch" :recipes="recipes" :meals="meals" @recipe-selected="selectRecipe" v-show="recipeListVisible"></menu-list>
 
          <div class="column">
            <div class="recipe-body container">
              <article class="message">
                <div class="message-header">
-                 <p id="recipe-title">{{ selectedRecipeName }}</p>
-                 <div class="block">
+                 <p id="recipe-title">{{ selectedRecipeName }}  <i class="fa fa-pencil" @click="editRecipe(selectedRecipeName)"></i></p>
+                 <div class="is-pulled-right">
                    <span v-for="group in selectedRecipeGroups" class="tag" :class="group" >{{ group }}</span>
+                   <button id="recipe-delete" class="delete" @click="deleteRecipe"></button>
                  </div>
                </div>
                <div class="message-body">
@@ -131,8 +100,11 @@
              </label>
            </p>
            <div class="control is-grouped">
-             <p class="control">
+             <p class="control" v-show="!editing">
                <button class="button" @click="addRecipe">Add Recipe</button>
+             </p>
+             <p class="control" v-show="editing">
+               <button class="button" @click="saveRecipeEdit">Update Recipe</button>
              </p>
              <p class="control">
                <button class="button" @click="closeNewRecipeWindow">Cancel</button>

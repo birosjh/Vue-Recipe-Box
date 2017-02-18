@@ -1,4 +1,70 @@
 window.onload = function() {
+  Vue.component('menu-list', {
+    props: [
+      "recipes",
+      "meals",
+      "extraclasses"
+    ],
+    computed: {
+      filteredRecipes: function() {
+        if(this.mealFilterGroups.length !== 0){
+          return this.getFilteredMeals();
+        }
+        else {
+          return this.recipes;
+        }
+      }
+    },
+    data: function() {
+      return {
+        filterControlsVisible: false,
+        mealFilterGroups: [ ],
+      }
+    },
+    template:
+    `<div class="recipe-list" :class="extraclasses" v-cloak>
+      <aside class="menu">
+        <ul class="menu-list">
+          <li @click="toggleFilterControls" id="filter-list-item">
+            <i class="fa fa-chevron-down"></i>
+            What Kinda Recipe?
+            <div id="filter-controls" v-show="filterControlsVisible">
+              <p class="control">
+                <label class="checkbox" v-for="meal in meals">
+                  <input type="checkbox" :value='meal' v-model="mealFilterGroups">
+                  {{ meal }}
+                </label>
+              </p>
+            </div>
+          </li>
+          <li v-for="recipe in filteredRecipes" @click="selectRecipe(recipe)"><a>{{ recipe.name }}</a></li>
+        </ul>
+      </aside>
+    </div>`,
+    methods: {
+      toggleFilterControls: function() {
+        this.filterControlsVisible = !this.filterControlsVisible;
+      },
+      getFilteredMeals: function() {
+        var mealGroups = this.mealFilterGroups;
+        var recipes = this.recipes;
+        var sortedRecipes = [];
+        for(var recipe in recipes){
+          for(group in mealGroups){
+            if(recipes[recipe].groups.indexOf(mealGroups[group]) >= 0 ){
+              sortedRecipes.push(recipes[recipe]);
+              break;
+            }
+          }
+        }
+        return sortedRecipes;
+      },
+      selectRecipe: function(recipe){
+        this.$emit('recipe-selected', recipe);
+      }
+    }
+  })
+
 
   const app = new Vue({
     el: '#app',
@@ -55,20 +121,11 @@ window.onload = function() {
       newRecipeIngredients: "",
       newRecipeInstructions: "",
       newRecipeGroups: [ ],
+      editing: false,
       selectedRecipeName: "",
       selectedRecipeIngredients: [ ],
       selectedRecipeInstructions: "",
       selectedRecipeGroups: [ ]
-    },
-    computed: {
-      filteredRecipes: function() {
-        if(this.mealFilterGroups.length !== 0){
-          return this.getFilteredMeals();
-        }
-        else {
-          return this.recipes;
-        }
-      }
     },
     created: function () {
       this.selectRecipe(this.recipes[0]);
@@ -84,21 +141,27 @@ window.onload = function() {
                               "instructions" : this.newRecipeInstructions,
                               "groups" : this.newRecipeGroups
                             });
-          this.clearRecipeWindow();
+          this.clearNewRecipeWindow();
           this.closeNewRecipeWindow();
         }
       },
-      clearRecipeWindow: function () {
-        this.newRecipeName = "";
-        this.newRecipeIngredients = "";
-        this.newRecipeInstructions = "";
-        this.newRecipeGroups = [ ];
+      updateRecipeWindow: function(recipeObject){
+        this.newRecipeName = recipeObject.name;
+        this.newRecipeIngredients = recipeObject.ingredients.join(",");
+        this.newRecipeInstructions = recipeObject.instructions;
+        this.newRecipeGroups = recipeObject.groups;
+      },
+      clearNewRecipeWindow: function () {
+        var clearObject = {
+          name: "",
+          ingredients: [],
+          instructions: "",
+          groups: [ ]
+        }
+        this.updateRecipeWindow(clearObject)
       },
       toggleRecipeList: function () {
         this.recipeListVisible = !this.recipeListVisible;
-      },
-      toggleFilterControls: function() {
-        this.filterControlsVisible = !this.filterControlsVisible;
       },
       selectRecipe: function (recipe) {
         this.selectedRecipeName = recipe.name;
@@ -110,21 +173,31 @@ window.onload = function() {
         this.modalOnOff = this.modalOnOff + "is-active";
       },
       closeNewRecipeWindow: function () {
+        if(this.editing){
+          this.editing = !this.editing;
+        }
+        this.clearNewRecipeWindow();
         this.modalOnOff = "modal ";
       },
-      getFilteredMeals: function() {
-        var mealGroups = this.mealFilterGroups;
-        var recipes = this.recipes;
-        var sortedRecipes = [];
-        for(var recipe in recipes){
-          for(group in mealGroups){
-            if(recipes[recipe].groups.indexOf(mealGroups[group]) >= 0 ){
-              sortedRecipes.push(recipes[recipe]);
-              break;
-            }
-          }
-        }
-        return sortedRecipes;
+      findRecipeIndexByName: function(name) {
+        var indexOfRecipe = this.recipes.findIndex(recipe => recipe.name === name)
+        console.log(indexOfRecipe);
+        return indexOfRecipe;
+      },
+      editRecipe: function(name) {
+        this.editing = !this.editing;
+
+        var recipeIndex = this.findRecipeIndexByName(name);
+        var recipeToEdit = this.recipes[recipeIndex];
+
+        this.showNewRecipeWindow();
+        this.updateRecipeWindow(recipeToEdit);
+      },
+      saveRecipeEdit: function() {
+        console.log("delete!");
+      },
+      deleteRecipe: function() {
+        console.log("delete!");
       }
     }
   })

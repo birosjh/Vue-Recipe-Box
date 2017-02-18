@@ -15,11 +15,12 @@ html, body {
     font-size: 1.5rem; }
 
 #filter-controls {
-  background-color: grey;
+  background-color: #FFFFFF;
   border-radius: 10px;
+  color: black;
   margin: 10px;
   padding: 5px;
-  width: 220px; }
+  width: 90%; }
   #filter-controls .checkbox {
     margin: 5px;
     display: block; }
@@ -38,6 +39,8 @@ html, body {
     border-bottom: 1px solid #BDBDBD;
     padding: 4px;
     color: #FFFFFF; }
+  .menu-list #filter-list-item {
+    background-color: #f06292; }
 
 .message .breakfast {
   background-color: #EFCB68; }
@@ -52,6 +55,8 @@ html, body {
   color: #FFFFFF;
   font-size: 1.125rem; }
 .message .tag {
+  margin: 10px 3px; }
+.message #recipe-delete {
   margin: 10px 3px; }
 
 .recipe-body {
